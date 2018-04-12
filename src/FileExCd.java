@@ -34,6 +34,10 @@ public class FileExCd {
 					type();
 				} else if (command.equalsIgnoreCase("copy")) {
 					copy();
+				} else if (command.equalsIgnoreCase("md")) {
+					md();
+				} else if (command.equalsIgnoreCase("md")) {
+					md();
 				} else {
 					for (int i = 0; i < argArr.length; i++) {
 						System.out.println(argArr[i]);
@@ -45,6 +49,15 @@ public class FileExCd {
 		}
 	}
 
+	public static void md() throws IOException {
+		String inputPath = curDir.getCanonicalPath() + "\\" + argArr[1];
+		File mkdir = new File(inputPath);
+		if(!mkdir.mkdirs()) {
+			System.out.println("명령 구문이 올바르지 않습니다.");
+			return;
+		}
+	}
+	
 	public static void copy() throws IOException {
 		
 		File[] list = curDir.listFiles();
