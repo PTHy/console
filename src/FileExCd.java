@@ -70,7 +70,7 @@ public class FileExCd {
 	public static void exit() {
 		System.exit(0);
 	}
-
+	
 	public static void del() throws IOException {
 		String inputPath = curDir.getCanonicalPath() + "\\" + argArr[1];
 		Scanner sc = new Scanner(System.in);
@@ -83,16 +83,43 @@ public class FileExCd {
 			System.out.println(mkdir.getCanonicalPath()+"을(를) 찾을 수 없습니다.");
 			return;
 		}
-		while(true) {
-			System.out.print(mkdir.getCanonicalPath()+"\\*, 계속하시겠습니까(Y/N)?");
-			chk = sc.nextLine();
-			if(chk.equalsIgnoreCase("Y")) {
-				break;
-			}else if(chk.equalsIgnoreCase("N")) {
-				return;
+		if(mkdir.isDirectory()) {
+			while(true) {
+				System.out.print(mkdir.getCanonicalPath()+"\\*, 계속하시겠습니까(Y/N)?");
+				chk = sc.nextLine();
+				if(chk.equalsIgnoreCase("Y")) {
+					break;
+				}else if(chk.equalsIgnoreCase("N")) {
+					return;
+				}
 			}
 		}
+		//재귀함수로 mkdir 리스트 돌려서 파일만 삭제
 		mkdir.delete();
+	}
+	
+	public static void rd() throws IOException {
+		String inputPath = curDir.getCanonicalPath() + "\\" + argArr[1];
+		Scanner sc = new Scanner(System.in);
+		String chk;
+		//하위 디렉터리와 자신도 한꺼번에 지우는 /S 추가
+		if (!(argArr[1].indexOf(":") > -1)) {
+			inputPath = curDir.getCanonicalPath() + "\\" + argArr[1];
+		}
+		File mkdir = new File(inputPath);
+		File[] exitChk;
+		if (!mkdir.exists()) {
+			System.out.println("지정한 파일을 찾을 수 없습니다.");
+			return;
+		}
+		exitChk = mkdir.listFiles();
+		if(exitChk[0] == null) {
+			mkdir.delete();
+			return;
+		}else {
+			System.out.println("디렉터리가 비어 있지 않습니다.");
+			return;
+		}
 	}
 
 	public static void copy() throws IOException {
