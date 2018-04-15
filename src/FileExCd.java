@@ -43,6 +43,8 @@ public class FileExCd {
 					rd();
 				} else if (command.equalsIgnoreCase("deltree")) {
 					deltree();
+				} else if (command.equalsIgnoreCase("ren")) {
+					ren();
 				} else {
 					for (int i = 0; i < argArr.length; i++) {
 						System.out.println(argArr[i]);
@@ -125,23 +127,41 @@ public class FileExCd {
 			tmp.delete();
 		}
 	}
-	
-	//ren - Rename File
-	
-	public static void ren() {
-		if(argArr.length == 3) {
-			File orginFile = new File(argArr[1]);
-			File newFile =  new File(argArr[2]);
-		}else {
+
+	// ren - Rename File
+
+	public static void ren() throws IOException {
+		File originFile;
+		File newFile;
+		String originPath;
+		String newPath;
+		
+		originPath = curDir.getCanonicalPath() + "\\" + argArr[1];
+		newPath = curDir.getCanonicalPath() + "\\" + argArr[2];
+		if (argArr.length == 3) {
+			originFile = new File(originPath);
+			newFile = new File(newPath);
+
+			if (originFile.exists()) {
+				if (!newFile.exists()) {
+					originFile.renameTo(newFile);
+				} else {
+					System.out.println("중복되는 파일 이름이 있거나 파일을 찾을 수 없습니다.");
+				}
+			} else {
+				System.out.println("originPath : "+originPath + " newPath : "+newPath);
+				System.out.println("지정된 파일을 찾을 수 없습니다");
+				return;
+			}
+		} else {
 			System.out.println("명령 구문이 올바르지 않습니다.");
 			return;
 		}
 	}
-	
-	//deltree - Delete All Directory
-	
-	public static void deltree() throws IOException
-	{
+
+	// deltree - Delete All Directory
+
+	public static void deltree() throws IOException {
 		String inputPath = argArr[1];
 		Scanner sc = new Scanner(System.in);
 		String chk;
@@ -356,7 +376,7 @@ public class FileExCd {
 			originPath = curDir.getCanonicalPath() + "//" + originPath;
 			copyPath = curDir.getCanonicalPath() + "//" + copyPath;
 			if (originCnt == 0) {
-				System.out.println("originPath : "+originPath+" copyPath : "+copyPath);
+				System.out.println("originPath : " + originPath + " copyPath : " + copyPath);
 				System.out.println("지정된 파일을 찾을 수 없습니다.");
 			} else if (copyCnt == 1) {
 				Scanner sc = new Scanner(System.in);
