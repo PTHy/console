@@ -41,6 +41,8 @@ public class FileExCd {
 					del();
 				} else if (command.equalsIgnoreCase("rd")) {
 					rd();
+				} else if (command.equalsIgnoreCase("deltree")) {
+					deltree();
 				} else {
 					for (int i = 0; i < argArr.length; i++) {
 						System.out.println(argArr[i]);
@@ -52,8 +54,8 @@ public class FileExCd {
 		}
 	}
 
-	//md - Make Diractory
-	
+	// md - Make Diractory
+
 	public static void md() throws IOException {
 		String inputPath = argArr[1];
 		if (!(argArr[1].indexOf(":") > -1)) {
@@ -61,8 +63,8 @@ public class FileExCd {
 		}
 		File tmp = new File(inputPath);
 		File mkdir = new File(inputPath);
-		if(mkdir.exists()) {
-			System.out.println("하위 디렉터리 또는 파일 "+mkdir.getName()+"이(가) 이미 있습니다.");
+		if (mkdir.exists()) {
+			System.out.println("하위 디렉터리 또는 파일 " + mkdir.getName() + "이(가) 이미 있습니다.");
 		}
 		if (!mkdir.mkdirs()) {
 			System.out.println("명령 구문이 올바르지 않습니다.");
@@ -70,14 +72,14 @@ public class FileExCd {
 		}
 	}
 
-	//exit - exit
-	
+	// exit - exit
+
 	public static void exit() {
 		System.exit(0);
 	}
-	
-	//del - Delete File
-	
+
+	// del - Delete File
+
 	public static void del() throws IOException {
 		String inputPath = curDir.getCanonicalPath() + "\\" + argArr[1];
 		Scanner sc = new Scanner(System.in);
@@ -88,73 +90,99 @@ public class FileExCd {
 		File mkdir = new File(inputPath);
 		File[] list;
 		if (!mkdir.exists()) {
-			System.out.println(mkdir.getCanonicalPath()+"을(를) 찾을 수 없습니다.");
+			System.out.println(mkdir.getCanonicalPath() + "을(를) 찾을 수 없습니다.");
 			return;
 		}
-		if(mkdir.isDirectory()) {
+		if (mkdir.isDirectory()) {
 			list = mkdir.listFiles();
-			while(true) {
-				System.out.print(mkdir.getCanonicalPath()+"\\*, 계속하시겠습니까(Y/N)?");
+			while (true) {
+				System.out.print(mkdir.getCanonicalPath() + "\\*, 계속하시겠습니까(Y/N)?");
 				chk = sc.nextLine();
-				if(chk.equalsIgnoreCase("Y")) {
-					for(File file : list) {
-						if(file.isFile())
+				if (chk.equalsIgnoreCase("Y")) {
+					for (File file : list) {
+						if (file.isFile())
 							file.delete();
 					}
 					return;
-				}else if(chk.equalsIgnoreCase("N")) {
+				} else if (chk.equalsIgnoreCase("N")) {
 					return;
 				}
 			}
 		}
-		if(!mkdir.isDirectory()) {
+		if (!mkdir.isDirectory()) {
 			mkdir.delete();
 		}
 	}
-	
-	//rd - Delete Directory
-	
+
+	// rd - Delete Directory
+
 	public static void rdContent(File file) {
 		File[] list = file.listFiles();
-		for(File tmp : list) {
-			if(tmp.isDirectory()) {
+		for (File tmp : list) {
+			if (tmp.isDirectory()) {
 				rdContent(tmp);
 			}
 			tmp.delete();
 		}
 	}
 	
-	public static void rd() throws IOException {
+	//ren - Rename File
+	
+	public static void ren() {
+		if(argArr.length == 3) {
+			File orginFile = new File(argArr[1]);
+			File newFile =  new File(argArr[2]);
+		}else {
+			System.out.println("명령 구문이 올바르지 않습니다.");
+			return;
+		}
+	}
+	
+	//deltree - Delete All Directory
+	
+	public static void deltree() throws IOException
+	{
 		String inputPath = argArr[1];
 		Scanner sc = new Scanner(System.in);
 		String chk;
 		if (!(argArr[1].indexOf(":") > -1)) {
-			inputPath = curDir.getCanonicalPath() + "\\" + argArr[2];
+			inputPath = curDir.getCanonicalPath() + "\\" + argArr[1];
 		}
 		File mkdir = new File(inputPath);
 		if (!mkdir.exists()) {
 			System.out.println("지정한 파일을 찾을 수 없습니다.");
 			return;
 		}
-		if(argArr.length == 3 && argArr[1].equalsIgnoreCase("\\s")) {
-			rdContent(mkdir);
+		rdContent(mkdir);
+		mkdir.delete();
+	}
+
+	public static void rd() throws IOException {
+		String inputPath = argArr[1];
+		Scanner sc = new Scanner(System.in);
+		String chk;
+		if (!(argArr[1].indexOf(":") > -1)) {
+			inputPath = curDir.getCanonicalPath() + "\\" + argArr[1];
+		}
+		File mkdir = new File(inputPath);
+		if (!mkdir.exists()) {
+			System.out.println("지정한 파일을 찾을 수 없습니다.");
+			return;
+		}
+		File[] exitChk;
+		exitChk = mkdir.listFiles();
+		if (exitChk[0] == null) {
 			mkdir.delete();
-		}else if(argArr.length == 2){
-			File[] exitChk;
-			exitChk = mkdir.listFiles();
-			if(exitChk[0] == null) {
-				mkdir.delete();
-				return;
-			}else {
-				System.out.println("디렉터리가 비어 있지 않습니다.");
-				return;
-			}
+			return;
+		} else {
+			System.out.println("디렉터리가 비어 있지 않습니다.");
+			return;
 
 		}
 	}
 
-	//Copy - Copy File
-	
+	// Copy - Copy File
+
 	public static void copy() throws IOException {
 
 		File[] list = curDir.listFiles();
@@ -314,14 +342,98 @@ public class FileExCd {
 				}
 				System.out.println("복사가 완료되었습니다");
 			}
+		} else if (argArr.length == 4 && argArr[1].equals("/-y")) {
+			originPath = argArr[2];
+			copyPath = argArr[3];
+			for (File file : list) {
+				if (file.getName().equals(originPath)) {
+					originCnt++;
+				}
+				if (file.getName().equals(copyPath)) {
+					copyCnt++;
+				}
+			}
+			originPath = curDir.getCanonicalPath() + "//" + originPath;
+			copyPath = curDir.getCanonicalPath() + "//" + copyPath;
+			if (originCnt == 0) {
+				System.out.println("originPath : "+originPath+" copyPath : "+copyPath);
+				System.out.println("지정된 파일을 찾을 수 없습니다.");
+			} else if (copyCnt == 1) {
+				Scanner sc = new Scanner(System.in);
+				String input;
+				originFile = new File(originPath);
+				copyFile = new File(copyPath);
+				FileInputStream fis = new FileInputStream(originFile);
+				FileOutputStream fos = new FileOutputStream(copyPath);
+
+				System.out.print(copyFile.getName() + "을(를) 덮어쓰시겠습니까? (Yes/No): ");
+				input = sc.nextLine();
+
+				if (input.equalsIgnoreCase("yes")) {
+					try {
+						while ((i = fis.read()) != -1) {
+
+							// FileOutputStream에 읽은 데이터를 출력한다.
+							fos.write(i);
+						}
+					} catch (Exception e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					} finally {
+						if (fis != null)
+							fis.close();
+						if (fos != null)
+							fos.close();
+					}
+					System.out.println("붙여쓰기가 완료되었습니다");
+				} else if (input.equalsIgnoreCase("no")) {
+					System.out.println("붙여쓰기가 취소되었습니다");
+					return;
+				} else {
+					System.out.println("잘못된 접근입니다.");
+					return;
+				}
+			} else {
+				originFile = new File(originPath);
+				copyFile = new File(copyPath);
+				FileInputStream fis = null;
+				FileOutputStream fos = null;
+
+				try {
+					copyFile.createNewFile();
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+
+				fis = new FileInputStream(originFile);
+				fos = new FileOutputStream(copyPath);
+
+				try {
+					while ((i = fis.read()) != -1) {
+
+						// FileOutputStream에 읽은 데이터를 출력한다.
+						fos.write(i);
+					}
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} finally {
+					if (fis != null)
+						fis.close();
+					if (fos != null)
+						fos.close();
+				}
+				System.out.println("복사가 완료되었습니다");
+			}
 		} else {
 			System.out.println("잘못된 접근입니다");
 			return;
 		}
 	}
 
-	//Type - Read File
-	
+	// Type - Read File
+
 	public static void type() throws IOException {
 		File[] list = curDir.listFiles();
 		String path = argArr[1];
@@ -346,8 +458,8 @@ public class FileExCd {
 			System.out.println("명령 구문이 올바르지 않습니다.");
 		}
 	}
-	
-	//cd - Move Directory
+
+	// cd - Move Directory
 
 	public static void cd() {
 		if (argArr.length == 1 && !argArr[0].equalsIgnoreCase("cd..")) {
@@ -384,8 +496,8 @@ public class FileExCd {
 		}
 	}
 
-	//Dir - File list
-	
+	// Dir - File list
+
 	public static void dir() {
 		File[] list = curDir.listFiles();
 		long millisec;
