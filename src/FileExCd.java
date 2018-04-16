@@ -81,7 +81,7 @@ public class FileExCd {
 		System.exit(0);
 	}
 
-	// del - Delete File /p /s
+	// del - Delete File /p /s /f
 
 	public static void delContent_1(File file) throws IOException {
 		File[] list = file.listFiles();
@@ -109,6 +109,7 @@ public class FileExCd {
 						delchk++;
 					}
 				} else if (!tmp.canWrite()) {
+					System.out.println(tmp.getCanonicalPath());
 					System.out.println("엑세스가 거부되었습니다.");
 				}
 			}
@@ -128,6 +129,7 @@ public class FileExCd {
 						delchk++;
 					}
 				} else if (!tmp.canWrite()) {
+					System.out.println(tmp.getCanonicalPath());
 					System.out.println("엑세스가 거부되었습니다.");
 				}
 			}
@@ -157,22 +159,39 @@ public class FileExCd {
 			}
 			if (mkdir.isDirectory()) {
 				list = mkdir.listFiles();
-				while (true) {
-					System.out.print(mkdir.getCanonicalPath() + "\\*, 계속하시겠습니까(Y/N)?");
-					chk = sc.nextLine();
-					if (chk.equalsIgnoreCase("Y")) {
-						for (File file : list) {
-							if (file.isFile())
-								file.delete();
+				for (File file : list) {
+					if(file.isFile()) {
+						while(true) {
+							if (file.isFile()) {
+								System.out.print(file.getCanonicalPath() + ", 삭제하시겠습니까(Y/N)?");
+								chk = sc.nextLine();
+								if (chk.equalsIgnoreCase("Y")) {
+									file.delete();
+									break;
+								} else if (chk.equalsIgnoreCase("N")) {
+									break;
+								} else {
+									continue;
+								}
+							}
 						}
-						return;
-					} else if (chk.equalsIgnoreCase("N")) {
-						return;
 					}
 				}
+				System.out.println("");
 			}
 			if (!mkdir.isDirectory()) {
+				while (true) {
+					System.out.print(mkdir.getCanonicalPath() + ", 삭제하시겠습니까(Y/N)?");
+					chk = sc.nextLine();
+					if (chk.equalsIgnoreCase("Y"))
+						break;
+					else if (chk.equalsIgnoreCase("N"))
+						return;
+					else
+						continue;
+				}
 				mkdir.delete();
+				System.out.println();
 			}
 		} else if (argArr.length == 3 && argArr[1].equalsIgnoreCase("/s")) {
 			if (mkdir.isDirectory()) {
@@ -208,6 +227,7 @@ public class FileExCd {
 			}
 			if (!mkdir.isDirectory()) {
 				mkdir.delete();
+				System.out.println("");
 			}
 		} else {
 			if (!mkdir.exists()) {
@@ -225,6 +245,7 @@ public class FileExCd {
 								if (file.canWrite()) {
 									file.delete();
 								} else if (!file.canWrite()) {
+									System.out.println(file.getCanonicalPath());
 									System.out.println("엑세스가 거부되었습니다.");
 								}
 							}
@@ -239,6 +260,7 @@ public class FileExCd {
 				if (mkdir.canWrite()) {
 					mkdir.delete();
 				} else if (!mkdir.canWrite()) {
+					System.out.println(mkdir.getCanonicalPath());
 					System.out.println("엑세스가 거부되었습니다.");
 				}
 			}
@@ -374,7 +396,8 @@ public class FileExCd {
 	public static void copy() throws IOException {
 
 		File[] list = curDir.listFiles();
-		int originCnt = 0, copyCnt = 0, i;
+		int originCnt = 0, copyCnt = 0, i, cnt = 0;
+		;
 		String originPath, copyPath;
 		File originFile, copyFile;
 		if (argArr.length == 4 && argArr[1].equals("/y")) {
@@ -413,6 +436,8 @@ public class FileExCd {
 					if (fos != null)
 						fos.close();
 				}
+				cnt++;
+				System.out.println("\t" + cnt + "개 파일이 복사되었습니다.");
 			} else {
 				originFile = new File(originPath);
 				copyFile = new File(copyPath);
@@ -444,6 +469,8 @@ public class FileExCd {
 					if (fos != null)
 						fos.close();
 				}
+				cnt++;
+				System.out.println("\t" + cnt + "개 파일이 복사되었습니다.");
 			}
 		} else if (argArr.length == 3) {
 			originPath = argArr[1];
@@ -468,33 +495,34 @@ public class FileExCd {
 				FileInputStream fis = new FileInputStream(originFile);
 				FileOutputStream fos = new FileOutputStream(copyPath);
 
-				System.out.print(copyFile.getName() + "을(를) 덮어쓰시겠습니까? (Yes/No): ");
-				input = sc.nextLine();
+				while (true) {
+					System.out.print(copyFile.getName() + "을(를) 덮어쓰시겠습니까? (Yes/No): ");
+					input = sc.nextLine();
 
-				if (input.equalsIgnoreCase("yes")) {
-					try {
-						while ((i = fis.read()) != -1) {
-
-							// FileOutputStream에 읽은 데이터를 출력한다.
-							fos.write(i);
-						}
-					} catch (Exception e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					} finally {
-						if (fis != null)
-							fis.close();
-						if (fos != null)
-							fos.close();
-					}
-					System.out.println("붙여쓰기가 완료되었습니다");
-				} else if (input.equalsIgnoreCase("no")) {
-					System.out.println("붙여쓰기가 취소되었습니다");
-					return;
-				} else {
-					System.out.println("잘못된 접근입니다.");
-					return;
+					if (input.equalsIgnoreCase("y") || input.equalsIgnoreCase("yes"))
+						break;
+					else if (input.equalsIgnoreCase("n") || input.equalsIgnoreCase("no"))
+						return;
+					else
+						continue;
 				}
+
+				try {
+					while ((i = fis.read()) != -1) {
+						// FileOutputStream에 읽은 데이터를 출력한다.
+						fos.write(i);
+					}
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} finally {
+					if (fis != null)
+						fis.close();
+					if (fos != null)
+						fos.close();
+				}
+				cnt++;
+				System.out.println("\t" + cnt + "개 파일이 복사되었습니다.");
 			} else {
 				originFile = new File(originPath);
 				copyFile = new File(copyPath);
@@ -526,7 +554,8 @@ public class FileExCd {
 					if (fos != null)
 						fos.close();
 				}
-				System.out.println("복사가 완료되었습니다");
+				cnt++;
+				System.out.println("\t" + cnt + "개 파일이 복사되었습니다.");
 			}
 		} else if (argArr.length == 4 && argArr[1].equals("/-y")) {
 			originPath = argArr[2];
@@ -552,33 +581,34 @@ public class FileExCd {
 				FileInputStream fis = new FileInputStream(originFile);
 				FileOutputStream fos = new FileOutputStream(copyPath);
 
-				System.out.print(copyFile.getName() + "을(를) 덮어쓰시겠습니까? (Yes/No): ");
-				input = sc.nextLine();
+				while (true) {
+					System.out.print(copyFile.getName() + "을(를) 덮어쓰시겠습니까? (Yes/No): ");
+					input = sc.nextLine();
 
-				if (input.equalsIgnoreCase("yes")) {
-					try {
-						while ((i = fis.read()) != -1) {
-
-							// FileOutputStream에 읽은 데이터를 출력한다.
-							fos.write(i);
-						}
-					} catch (Exception e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					} finally {
-						if (fis != null)
-							fis.close();
-						if (fos != null)
-							fos.close();
-					}
-					System.out.println("붙여쓰기가 완료되었습니다");
-				} else if (input.equalsIgnoreCase("no")) {
-					System.out.println("붙여쓰기가 취소되었습니다");
-					return;
-				} else {
-					System.out.println("잘못된 접근입니다.");
-					return;
+					if (input.equalsIgnoreCase("y") || input.equalsIgnoreCase("yes"))
+						break;
+					else if (input.equalsIgnoreCase("n") || input.equalsIgnoreCase("no"))
+						return;
+					else
+						continue;
 				}
+
+				try {
+					while ((i = fis.read()) != -1) {
+						// FileOutputStream에 읽은 데이터를 출력한다.
+						fos.write(i);
+					}
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} finally {
+					if (fis != null)
+						fis.close();
+					if (fos != null)
+						fos.close();
+				}
+				cnt++;
+				System.out.println("\t" + cnt + "개 파일이 복사되었습니다.");
 			} else {
 				originFile = new File(originPath);
 				copyFile = new File(copyPath);
@@ -610,7 +640,8 @@ public class FileExCd {
 					if (fos != null)
 						fos.close();
 				}
-				System.out.println("복사가 완료되었습니다");
+				cnt++;
+				System.out.println("\t" + cnt + "개 파일이 복사되었습니다.");
 			}
 		} else {
 			System.out.println("잘못된 접근입니다");
@@ -765,4 +796,5 @@ public class FileExCd {
 			System.out.println("존재하지 않는 디렉터리입니다");
 		}
 	}
+
 }
