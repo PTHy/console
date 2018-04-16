@@ -9,6 +9,7 @@ import java.util.Scanner;
 public class FileExCd {
 	static String[] argArr;
 	static File curDir;
+	static int delchk = 0;
 
 	public static void main(String[] args) {
 		curDir = new File(System.getProperty("user.dir"));
@@ -80,52 +81,169 @@ public class FileExCd {
 		System.exit(0);
 	}
 
-	// del - Delete File
+	// del - Delete File /p /s
+
+	public static void delContent_1(File file) throws IOException {
+		File[] list = file.listFiles();
+		Scanner sc = new Scanner(System.in);
+		String chk;
+
+		while (true) {
+			System.out.print(file.getCanonicalPath() + "\\* 계속하시겠습니까(Y/N)?");
+			chk = sc.nextLine();
+			if (chk.equalsIgnoreCase("y"))
+				break;
+			else if (chk.equalsIgnoreCase("n"))
+				return;
+			else
+				continue;
+		}
+		for (File tmp : list) {
+			if (tmp.isDirectory()) {
+				delContent_1(tmp);
+			}
+			if (tmp.isFile()) {
+				if (tmp.canWrite()) {
+					if (tmp.delete()) {
+						System.out.println("파일 삭제 - " + tmp.getCanonicalPath());
+						delchk++;
+					}
+				} else if (!tmp.canWrite()) {
+					System.out.println("엑세스가 거부되었습니다.");
+				}
+			}
+		}
+	}
+
+	public static void delContent_2(File file, String delFile) throws IOException {
+		File[] list = file.listFiles();
+		for (File tmp : list) {
+			if (tmp.isDirectory()) {
+				delContent_2(tmp, delFile);
+			}
+			if (tmp.getName().equalsIgnoreCase(delFile)) {
+				if (tmp.canWrite()) {
+					if (tmp.delete()) {
+						System.out.println("파일 삭제 - " + tmp.getCanonicalPath());
+						delchk++;
+					}
+				} else if (!tmp.canWrite()) {
+					System.out.println("엑세스가 거부되었습니다.");
+				}
+			}
+		}
+	}
 
 	public static void del() throws IOException {
-		String inputPath = curDir.getCanonicalPath() + "\\" + argArr[1];
+		String inputPath = argArr[1];
 		Scanner sc = new Scanner(System.in);
 		String chk;
 		if (!(argArr[1].indexOf(":") > -1)) {
 			inputPath = curDir.getCanonicalPath() + "\\" + argArr[1];
 		}
+		if (argArr.length == 3) {
+			inputPath = argArr[1];
+			if (!(argArr[1].indexOf(":") > -1)) {
+				inputPath = curDir.getCanonicalPath() + "\\" + argArr[2];
+			}
+		}
 		File mkdir = new File(inputPath);
 		File[] list;
-		if (!mkdir.exists()) {
-			System.out.println(mkdir.getCanonicalPath() + "을(를) 찾을 수 없습니다.");
-			return;
-		}
-		if (mkdir.isDirectory()) {
-			list = mkdir.listFiles();
-			while (true) {
-				System.out.print(mkdir.getCanonicalPath() + "\\*, 계속하시겠습니까(Y/N)?");
-				chk = sc.nextLine();
-				if (chk.equalsIgnoreCase("Y")) {
-					for (File file : list) {
-						if (file.isFile())
-							file.delete();
+
+		if (argArr.length == 3 && argArr[1].equalsIgnoreCase("/p")) {
+			if (!mkdir.exists()) {
+				System.out.println(mkdir.getCanonicalPath() + "을(를) 찾을 수 없습니다.");
+				return;
+			}
+			if (mkdir.isDirectory()) {
+				list = mkdir.listFiles();
+				while (true) {
+					System.out.print(mkdir.getCanonicalPath() + "\\*, 계속하시겠습니까(Y/N)?");
+					chk = sc.nextLine();
+					if (chk.equalsIgnoreCase("Y")) {
+						for (File file : list) {
+							if (file.isFile())
+								file.delete();
+						}
+						return;
+					} else if (chk.equalsIgnoreCase("N")) {
+						return;
 					}
-					return;
-				} else if (chk.equalsIgnoreCase("N")) {
-					return;
+				}
+			}
+			if (!mkdir.isDirectory()) {
+				mkdir.delete();
+			}
+		} else if (argArr.length == 3 && argArr[1].equalsIgnoreCase("/s")) {
+			if (mkdir.isDirectory()) {
+				delContent_1(mkdir);
+				delchk++;
+			} else if (mkdir.isFile()) {
+				delContent_2(curDir, mkdir.getName());
+			}
+			if (delchk == 0)
+				System.out.println(mkdir.getCanonicalPath() + "을(를) 찾을 수 없습니다.");
+			delchk = 0;
+		} else if (argArr.length == 3 && argArr[1].equalsIgnoreCase("/f")) {
+			if (!mkdir.exists()) {
+				System.out.println(mkdir.getCanonicalPath() + "을(를) 찾을 수 없습니다.");
+				return;
+			}
+			if (mkdir.isDirectory()) {
+				list = mkdir.listFiles();
+				while (true) {
+					System.out.print(mkdir.getCanonicalPath() + "\\*, 계속하시겠습니까(Y/N)?");
+					chk = sc.nextLine();
+					if (chk.equalsIgnoreCase("Y")) {
+						for (File file : list) {
+							if (file.isFile()) {
+								file.delete();
+							}
+						}
+						return;
+					} else if (chk.equalsIgnoreCase("N")) {
+						return;
+					}
+				}
+			}
+			if (!mkdir.isDirectory()) {
+				mkdir.delete();
+			}
+		} else {
+			if (!mkdir.exists()) {
+				System.out.println(mkdir.getCanonicalPath() + "을(를) 찾을 수 없습니다.");
+				return;
+			}
+			if (mkdir.isDirectory()) {
+				list = mkdir.listFiles();
+				while (true) {
+					System.out.print(mkdir.getCanonicalPath() + "\\*, 계속하시겠습니까(Y/N)?");
+					chk = sc.nextLine();
+					if (chk.equalsIgnoreCase("Y")) {
+						for (File file : list) {
+							if (file.isFile()) {
+								if (file.canWrite()) {
+									file.delete();
+								} else if (!file.canWrite()) {
+									System.out.println("엑세스가 거부되었습니다.");
+								}
+							}
+						}
+						return;
+					} else if (chk.equalsIgnoreCase("N")) {
+						return;
+					}
+				}
+			}
+			if (!mkdir.isDirectory()) {
+				if (mkdir.canWrite()) {
+					mkdir.delete();
+				} else if (!mkdir.canWrite()) {
+					System.out.println("엑세스가 거부되었습니다.");
 				}
 			}
 		}
-		if (!mkdir.isDirectory()) {
-			mkdir.delete();
-		}
-	}
 
-	// rd - Delete Directory
-
-	public static void rdContent(File file) {
-		File[] list = file.listFiles();
-		for (File tmp : list) {
-			if (tmp.isDirectory()) {
-				rdContent(tmp);
-			}
-			tmp.delete();
-		}
 	}
 
 	// ren - Rename File
@@ -177,20 +295,54 @@ public class FileExCd {
 		mkdir.delete();
 	}
 
-	// rd - Delete Directory /s
+	// rd - Delete Directory /s /q
+
+	public static void rdContent(File file) {
+		File[] list = file.listFiles();
+		for (File tmp : list) {
+			if (tmp.isDirectory()) {
+				rdContent(tmp);
+			}
+			tmp.delete();
+		}
+	}
 
 	public static void rd() throws IOException {
 		String inputPath = argArr[1];
 		Scanner sc = new Scanner(System.in);
 		String chk;
-		if (argArr.length == 3 && argArr[1].equalsIgnoreCase("/s")) {
+		int qCnt = 0;
+		if ((argArr.length == 3 || argArr.length == 4) && argArr[1].equalsIgnoreCase("/s")) {
+			inputPath = argArr[2];
 			if (!(argArr[2].indexOf(":") > -1)) {
 				inputPath = curDir.getCanonicalPath() + "\\" + argArr[2];
 			}
+			if (argArr.length == 4 && argArr[2].equalsIgnoreCase("/q")) {
+				inputPath = argArr[3];
+				if (!(argArr[3].indexOf(":") > -1)) {
+					inputPath = curDir.getCanonicalPath() + "\\" + argArr[3];
+				}
+				qCnt = 1;
+			}
+
 			File mkdir = new File(inputPath);
+
 			if (!mkdir.exists()) {
 				System.out.println("지정한 파일을 찾을 수 없습니다.");
 				return;
+			}
+
+			if (qCnt == 0) {
+				while (true) {
+					System.out.print(mkdir.getName() + ", 계속하시겠습니까(Y/N)?");
+					chk = sc.nextLine();
+					if (chk.equalsIgnoreCase("y"))
+						break;
+					else if (chk.equalsIgnoreCase("n"))
+						return;
+					else
+						continue;
+				}
 			}
 			rdContent(mkdir);
 			mkdir.delete();
@@ -214,9 +366,6 @@ public class FileExCd {
 				return;
 
 			}
-		} else {
-			System.out.println("명령어 형식이 맞지 않습니다");
-			return;
 		}
 	}
 
