@@ -135,7 +135,7 @@ public class FileExCd {
 		File newFile;
 		String originPath;
 		String newPath;
-		
+
 		originPath = curDir.getCanonicalPath() + "\\" + argArr[1];
 		newPath = curDir.getCanonicalPath() + "\\" + argArr[2];
 		if (argArr.length == 3) {
@@ -149,7 +149,7 @@ public class FileExCd {
 					System.out.println("중복되는 파일 이름이 있거나 파일을 찾을 수 없습니다.");
 				}
 			} else {
-				System.out.println("originPath : "+originPath + " newPath : "+newPath);
+				System.out.println("originPath : " + originPath + " newPath : " + newPath);
 				System.out.println("지정된 파일을 찾을 수 없습니다");
 				return;
 			}
@@ -177,31 +177,50 @@ public class FileExCd {
 		mkdir.delete();
 	}
 
+	// rd - Delete Directory /s
+
 	public static void rd() throws IOException {
 		String inputPath = argArr[1];
 		Scanner sc = new Scanner(System.in);
 		String chk;
-		if (!(argArr[1].indexOf(":") > -1)) {
-			inputPath = curDir.getCanonicalPath() + "\\" + argArr[1];
-		}
-		File mkdir = new File(inputPath);
-		if (!mkdir.exists()) {
-			System.out.println("지정한 파일을 찾을 수 없습니다.");
-			return;
-		}
-		File[] exitChk;
-		exitChk = mkdir.listFiles();
-		if (exitChk[0] == null) {
+		if (argArr.length == 3 && argArr[1].equalsIgnoreCase("/s")) {
+			if (!(argArr[2].indexOf(":") > -1)) {
+				inputPath = curDir.getCanonicalPath() + "\\" + argArr[2];
+			}
+			File mkdir = new File(inputPath);
+			if (!mkdir.exists()) {
+				System.out.println("지정한 파일을 찾을 수 없습니다.");
+				return;
+			}
+			rdContent(mkdir);
 			mkdir.delete();
-			return;
-		} else {
-			System.out.println("디렉터리가 비어 있지 않습니다.");
-			return;
+		} else if (argArr.length == 2) {
+			if (!(argArr[1].indexOf(":") > -1)) {
+				inputPath = curDir.getCanonicalPath() + "\\" + argArr[1];
+			}
+			File mkdir = new File(inputPath);
+			if (!mkdir.exists()) {
+				System.out.println("지정한 파일을 찾을 수 없습니다.");
+				return;
+			}
 
+			File[] exitChk;
+			exitChk = mkdir.listFiles();
+			if (exitChk[0] == null) {
+				mkdir.delete();
+				return;
+			} else {
+				System.out.println("디렉터리가 비어 있지 않습니다.");
+				return;
+
+			}
+		} else {
+			System.out.println("명령어 형식이 맞지 않습니다");
+			return;
 		}
 	}
 
-	// Copy - Copy File
+	// Copy - Copy File /y /-y
 
 	public static void copy() throws IOException {
 
@@ -245,7 +264,6 @@ public class FileExCd {
 					if (fos != null)
 						fos.close();
 				}
-				System.out.println("붙여쓰기가 완료되었습니다");
 			} else {
 				originFile = new File(originPath);
 				copyFile = new File(copyPath);
@@ -277,7 +295,6 @@ public class FileExCd {
 					if (fos != null)
 						fos.close();
 				}
-				System.out.println("복사가 완료되었습니다");
 			}
 		} else if (argArr.length == 3) {
 			originPath = argArr[1];
@@ -516,7 +533,7 @@ public class FileExCd {
 		}
 	}
 
-	// Dir - File list
+	// Dir - File list /l /d
 
 	public static void dir() {
 		File[] list = curDir.listFiles();
@@ -535,7 +552,7 @@ public class FileExCd {
 				}
 				System.out.println("\t" + tempFile.getName());
 			}
-		} else if (argArr.length == 2 && argArr[1].equals("/ad")) {
+		} else if (argArr.length == 2 && argArr[1].equalsIgnoreCase("/ad")) {
 			for (File tempFile : list) {
 				millisec = tempFile.lastModified();
 				Date dt = new Date(millisec);
@@ -547,15 +564,33 @@ public class FileExCd {
 					System.out.println("\t" + tempFile.getName());
 				}
 			}
-		} else if (argArr.length == 2 && argArr[1].equals("/b")) {
+		} else if (argArr.length == 2 && argArr[1].equalsIgnoreCase("/b")) {
 			for (File tempFile : list) {
 				System.out.println(tempFile.getName());
 			}
-		} else if (argArr.length == 2 && argArr[1].equals("/w")) {
+		} else if (argArr.length == 2 && argArr[1].equalsIgnoreCase("/w")) {
 			for (File tempFile : list) {
 				System.out.print("[" + tempFile.getName() + "]\t");
 			}
 			System.out.println();
+		} else if (argArr.length == 2 && argArr[1].equalsIgnoreCase("/d")) {
+			for (File tempFile : list) {
+				System.out.print("[" + tempFile.getName() + "]\n");
+			}
+			System.out.println();
+		} else if (argArr.length == 2 && argArr[1].equalsIgnoreCase("/l")) {
+			for (File tempFile : list) {
+				millisec = tempFile.lastModified();
+				Date dt = new Date(millisec);
+				SimpleDateFormat sd = new SimpleDateFormat("YYYY-MM-dd");
+
+				System.out.print(sd.format(dt) + "\t");
+
+				if (tempFile.isDirectory()) {
+					System.out.print("<DIR>");
+				}
+				System.out.println("\t" + tempFile.getName().toLowerCase());
+			}
 		} else if (argArr.length == 2) {
 			for (File tempFile : list) {
 				if (tempFile.isDirectory()) {
