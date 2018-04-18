@@ -103,7 +103,7 @@ public class FileExCd {
 				delContent_1(tmp);
 			}
 			if (tmp.isFile()) {
-				if (tmp.canWrite()) {
+				if (tmp.canWrite() && !tmp.isHidden()) {
 					if (tmp.delete()) {
 						System.out.println("파일 삭제 - " + tmp.getCanonicalPath());
 						delchk++;
@@ -123,7 +123,7 @@ public class FileExCd {
 				delContent_2(tmp, delFile);
 			}
 			if (tmp.getName().equalsIgnoreCase(delFile)) {
-				if (tmp.canWrite()) {
+				if (tmp.canWrite() && !tmp.isHidden()) {
 					if (tmp.delete()) {
 						System.out.println("파일 삭제 - " + tmp.getCanonicalPath());
 						delchk++;
@@ -178,6 +178,10 @@ public class FileExCd {
 					}
 				}
 				System.out.println("");
+			}
+			if(mkdir.isFile() && mkdir.isHidden()) {
+				System.out.println("지정한 파일을 찾을 수 없습니다.");
+				return;
 			}
 			if (!mkdir.isDirectory()) {
 				while (true) {
