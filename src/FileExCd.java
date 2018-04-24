@@ -407,21 +407,34 @@ public class FileExCd {
 		if (argArr.length == 4 && argArr[1].equals("/y")) {
 			originPath = argArr[2];
 			copyPath = argArr[3];
+			if (!(originPath.indexOf(":") > -1)) {
+				originPath = curDir.getCanonicalPath() + "\\" + originPath;
+			}
+			if(!((copyPath.indexOf(":")) >1)) {
+				copyPath = curDir.getCanonicalPath() + "\\" + copyPath;				
+			}
+			
 			for (File file : list) {
-				if (file.getName().equals(originPath)) {
+				if (file.getCanonicalPath().equals(originPath)) {
 					originCnt++;
 				}
-				if (file.getName().equals(copyPath)) {
+				if (file.getCanonicalPath().equals(copyPath)) {
 					copyCnt++;
 				}
 			}
-			originPath = curDir.getCanonicalPath() + "//" + originPath;
-			copyPath = curDir.getCanonicalPath() + "//" + copyPath;
+			
 			if (originCnt == 0) {
 				System.out.println("지정된 파일을 찾을 수 없습니다.");
 			} else if (copyCnt == 1) {
 				originFile = new File(originPath);
 				copyFile = new File(copyPath);
+				
+				if(copyFile.isDirectory()) {
+					copyPath += "\\" + originFile.getName();
+					copyFile = new File(copyPath);
+				}
+				
+				
 				FileInputStream fis = new FileInputStream(originFile);
 				FileOutputStream fos = new FileOutputStream(copyPath);
 
@@ -445,6 +458,12 @@ public class FileExCd {
 			} else {
 				originFile = new File(originPath);
 				copyFile = new File(copyPath);
+				
+				if(copyFile.isDirectory()) {
+					copyPath += "\\" + originFile.getName();
+					copyFile = new File(copyPath);
+				}
+				
 				FileInputStream fis = null;
 				FileOutputStream fos = null;
 
@@ -479,23 +498,37 @@ public class FileExCd {
 		} else if (argArr.length == 3) {
 			originPath = argArr[1];
 			copyPath = argArr[2];
+			
+			if (!(originPath.indexOf(":") > -1)) {
+				originPath = curDir.getCanonicalPath() + "\\" + originPath;
+			}
+			if(!((copyPath.indexOf(":")) >1)) {
+				copyPath = curDir.getCanonicalPath() + "\\" + copyPath;				
+			}
+			
 			for (File file : list) {
-				if (file.getName().equals(originPath)) {
+				if (file.getCanonicalPath().equals(originPath)) {
 					originCnt++;
 				}
-				if (file.getName().equals(copyPath)) {
+				if (file.getCanonicalPath().equals(copyPath)) {
 					copyCnt++;
 				}
 			}
-			originPath = curDir.getCanonicalPath() + "//" + originPath;
-			copyPath = curDir.getCanonicalPath() + "//" + copyPath;
+			
 			if (originCnt == 0) {
+				System.out.println("originPath : "+originPath+" copyPath : "+copyPath);
 				System.out.println("지정된 파일을 찾을 수 없습니다.");
 			} else if (copyCnt == 1) {
 				Scanner sc = new Scanner(System.in);
 				String input;
 				originFile = new File(originPath);
 				copyFile = new File(copyPath);
+				
+				if(copyFile.isDirectory()) {
+					copyPath += "\\" + originFile.getName();
+					copyFile = new File(copyPath);
+				}
+				
 				FileInputStream fis = new FileInputStream(originFile);
 				FileOutputStream fos = new FileOutputStream(copyPath);
 
@@ -530,6 +563,12 @@ public class FileExCd {
 			} else {
 				originFile = new File(originPath);
 				copyFile = new File(copyPath);
+				
+				if(copyFile.isDirectory()) {
+					copyPath += "\\" + originFile.getName();
+					copyFile = new File(copyPath);
+				}
+				
 				FileInputStream fis = null;
 				FileOutputStream fos = null;
 
@@ -560,28 +599,40 @@ public class FileExCd {
 				}
 				cnt++;
 				System.out.println("\t" + cnt + "개 파일이 복사되었습니다.");
+				System.out.println("originPath : "+originPath+" copyPath : "+copyPath);
 			}
 		} else if (argArr.length == 4 && argArr[1].equals("/-y")) {
 			originPath = argArr[2];
 			copyPath = argArr[3];
+			
+			if (!(originPath.indexOf(":") > -1)) {
+				originPath = curDir.getCanonicalPath() + "\\" + originPath;
+			}
+			if(!((copyPath.indexOf(":")) >1)) {
+				copyPath = curDir.getCanonicalPath() + "\\" + copyPath;				
+			}
+			
 			for (File file : list) {
-				if (file.getName().equals(originPath)) {
+				if (file.getCanonicalPath().equals(originPath)) {
 					originCnt++;
 				}
-				if (file.getName().equals(copyPath)) {
+				if (file.getCanonicalPath().equals(copyPath)) {
 					copyCnt++;
 				}
 			}
-			originPath = curDir.getCanonicalPath() + "//" + originPath;
-			copyPath = curDir.getCanonicalPath() + "//" + copyPath;
 			if (originCnt == 0) {
-				System.out.println("originPath : " + originPath + " copyPath : " + copyPath);
 				System.out.println("지정된 파일을 찾을 수 없습니다.");
 			} else if (copyCnt == 1) {
 				Scanner sc = new Scanner(System.in);
 				String input;
 				originFile = new File(originPath);
 				copyFile = new File(copyPath);
+				
+				if(copyFile.isDirectory()) {
+					copyPath += "\\" + originFile.getName();
+					copyFile = new File(copyPath);
+				}
+				
 				FileInputStream fis = new FileInputStream(originFile);
 				FileOutputStream fos = new FileOutputStream(copyPath);
 
@@ -616,6 +667,12 @@ public class FileExCd {
 			} else {
 				originFile = new File(originPath);
 				copyFile = new File(copyPath);
+				
+				if(copyFile.isDirectory()) {
+					copyPath += "\\" + originFile.getName();
+					copyFile = new File(copyPath);
+				}
+				
 				FileInputStream fis = null;
 				FileOutputStream fos = null;
 
